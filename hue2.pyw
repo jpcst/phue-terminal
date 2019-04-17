@@ -2,29 +2,15 @@ from tkinter import *
 from phue import Bridge
 import requests
 
-# try:
-# 	with open('C:/Scrape/hue.txt','r') as f:
-# 		b = Bridge(f.read()) # Scrapa o ip do .txt no arg
-# 		b.connect()
-# 	#print('try') # Clareza
-#
-# except:
-# 	ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipaddress'] # Scrapa o ip da API
-# 	with open('C:/Scrape/hue.txt','w') as f:
-# 		f.write(ip) # Salva o ip em hue.txt
-# 	b = Bridge(ip)
-# 	b.connect()
-# 	#print('except') # Clareza
-
 try:
     with open('C:/Scrape/hue.txt', 'r') as f:
         b = Bridge(f.read())  # Scrapa o ip do .txt no arg
         b.connect()
-        print('Read from hue.txt.')
+        print('IP FROM HUE.TXT')
 
 except Exception as read_err:
     print(str(read_err))
-    print('Finding IP from meethue.')
+    print('IP FROM MEETHUE.COM')
     ip = requests.get('https://www.meethue.com/api/nupnp') \
         .json()[0]['internalipaddress']  # Scrapa o ip da API
     with open('C:/Scrape/hue.txt', 'w') as f:
