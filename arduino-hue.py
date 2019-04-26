@@ -3,7 +3,6 @@
 
 import serial
 from phue import Bridge
-import os
 import datetime
 now = datetime.datetime.now()
 
