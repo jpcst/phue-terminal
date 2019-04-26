@@ -19,13 +19,13 @@ i=0
 while True:
 	if(serial_data.inWaiting() > 0):
 		my_data = serial_data.readline().decode().strip()
-		print(my_data)
-
+		
 		teto1 = b.get_light(2,'on') 
 		teto2 = b.get_light(4,'on') # True = acessa, False = apagada
 		tetos = [teto1,teto2]
 
 		if (i>0):
+			print(my_data)
 			if(tetos[0] == True or tetos[1] == True):
 				b.set_light([2,4], 'on', False, transitiontime=0)
 				print(now.hour,':',now.minute,' -> OFF\n',sep='')
