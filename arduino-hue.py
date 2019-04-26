@@ -1,5 +1,6 @@
 # ARRUMAR
 #	Ignorar ERROR
+#	Adicionar hora p ativar
 
 import serial
 from phue import Bridge
