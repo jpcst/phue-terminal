@@ -1,6 +1,5 @@
 # ARRUMAR
 #	Ignorar ERROR
-#	Adicionar hora p ativar
 
 import serial
 from phue import Bridge
@@ -19,7 +18,7 @@ i=0
 while True:
 	if(serial_data.inWaiting() > 0):
 		my_data = serial_data.readline().decode().strip()
-		
+
 		teto1 = b.get_light(2,'on') 
 		teto2 = b.get_light(4,'on') # True = acessa, False = apagada
 		tetos = [teto1,teto2]
