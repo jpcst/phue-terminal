@@ -1,3 +1,4 @@
+# GUI and buttons to control the lights
 from tkinter import *
 from phue import Bridge
 import requests
