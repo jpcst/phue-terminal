@@ -1,4 +1,3 @@
-# GUI and buttons to control the lights
 from tkinter import *
 from phue import Bridge
 import requests
@@ -46,6 +45,22 @@ def cor():
 	for luz in b.get_light_objects():
 		luz.xy=[.7, .75]
 
+def teto():
+	teto1 = b.get_light(2,'on') 
+	teto2 = b.get_light(4,'on') # True = on, False = off
+	tetos = [teto1,teto2]
+	if(tetos[0] == True or tetos[1] == True):
+		lights[2].brightness=254
+		lights[4].brightness=254
+		b.set_light([2,4], 'on', False, transitiontime=0)
+	else:
+		b.set_light([2,4], 'on', True, transitiontime=0)
+		lights[2].xy = [.3,.3]
+		lights[4].xy = [.3,.3]
+		lights[2].brightness=254
+		lights[4].brightness=254
+		b.set_light()
+
 for light_id in lights:
 	channel_frame = Frame(horizontal_frame)
 	channel_frame.pack(side = LEFT)
@@ -71,9 +86,7 @@ action = Button(root, text=('3.B'), command=tres)
 action.pack(side = 'left')
 action = Button(root, text=('OFF'), command=off)
 action.pack(side = 'left')
+action = Button(root, text=('C.ON'), command=teto)
+action.pack(side = 'left')
 
 root.mainloop()
-
-
-
-
