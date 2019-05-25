@@ -2,6 +2,7 @@
 import serial, datetime, os, requests
 from phue import Bridge
 
+# add if para windows/linux
 def read_ip():
 	try:
 		with open('/home/jp/pha/ip.txt', 'r') as f:
@@ -34,6 +35,7 @@ def timer(hr,m):
 	else:
 		return False
 
+# add if para windows/linux
 def scrape_ip():
 	ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipadress']
 	with open('/home/jp/pha/ip.txt','w') as f:
@@ -72,8 +74,7 @@ def do_light(bd=0,c1=0,d=0,c2=0,brilho=254):
 		if(list[i] != 0):
 			i+=1
 			list_t.append(i)
-	print('selected',list_t,end='\n')
-
+	# print('selected',list_t,end='\n')
 	if (len(list_t) == 1):
 		if (b.get_light(list_t[0], 'on') == True):
 			b.set_light(list_t[0], 'on', False, transitiontime=0)
@@ -120,16 +121,16 @@ def do_light(bd=0,c1=0,d=0,c2=0,brilho=254):
 			lights[list_t[2]].brightness=brilho
 			lights[list_t[3]].brightness=brilho
 	os.system('cls' if os.name == 'nt' else 'clear')
+
 # def make_cor(bd=0,c1=0,d=0,c2=0):
+# integrar essa func em do_light
 
 os.system('cls' if os.name == 'nt' else 'clear')
 while True:
 	usr = input('\n[1] turn on sensor\n[2] set hour\n\n>> ')
-	v = usr.split()
-	# print(v)
-	if (len(usr) == 1):
-
-		if(usr == '1'): # LIGA O SENSOR
+	v = usr.split(' ')
+	if (len(v) == 1):
+		if(usr == '1'): # LIGA O SENSOR NA HORA DEFAULT
 			try:
 				b = read_ip()
 				lights = b.get_light_objects('id')
@@ -139,7 +140,7 @@ while True:
 				os.system('cls')
 				pass
 
-		elif(usr == '2'): # ALTERA A HORA
+		elif(usr == '2'): # ALTERA A HORA E LIGA SENSOR
 			try:
 				os.system('cls')
 				hr = int(input('>> h: '))
@@ -150,16 +151,38 @@ while True:
 			except KeyboardInterrupt:
 				os.system('cls')
 				pass
-
-		elif(usr == 'c'):
+		elif(usr == 'c'): # LIGA ALL TETO
 			do_light(c1=1,c2=1)
-		elif(usr == 'b'):
+		elif(usr == 'b'): # LIGA BED
 			do_light(bd=1)
-		elif(usr == 'd'):
+		elif(usr == 'd'): # LIGA DESK
 			do_light(d=1)
-		elif(usr == 'c1'):
+		elif(usr == 'c1'): # LIGA TETO 1
 			do_light(c1=1)
-		elif(usr == 'c2'):
+		elif(usr == 'c2'): # LIGA TETO 2
 			do_light(c2=1)
+
+
+	elif (len(v) == 2):
+		try:
+			float(v[1])
+			if (type(v[0]) == str and type(float(v[1])) == float):
+				do_light(bd=v[0],brilho=v[1])
+		except ValueError:
+			if (type(v[0]) == str and type(v[1]) == str):
+				if (v[0] == 'b' and v[1] == 'd' or v[0] == 'd' and v[1] == 'b'):
+					do_light(bd=1,d=1)
+				#fazer para as outras combinacoes
+
+
+	elif (len(v) == 3):
+		pass
+
+	elif (len(v) == 4):
+		pass
+
+
+
+
 
 	# se len(usr) == 2 -> c [brilho]
