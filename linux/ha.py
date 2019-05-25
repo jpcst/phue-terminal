@@ -2,23 +2,37 @@
 import serial, datetime, os, requests
 from phue import Bridge
 
-# add if para windows/linux
 def read_ip():
 	try:
-		with open('/home/jp/pha/ip.txt', 'r') as f:
-		    b = Bridge(f.read())
-		    b.connect()
-	except Exception as e:
+		if (os.name == 'nt'): # windows
+			with open('C:/scrape/ip.txt','w') as f:
+				b = Bridge(f.read())
+				b.connect()
+		else: # linux
+			with open('/home/jp/pha/ip.txt', 'r') as f:
+			    b = Bridge(f.read())
+			    b.connect()
+	except Exception as e: # se erro no IP, scrapar novo
+	    if (os.name == 'nt'): # windows
+	    	with open('C:/scrape/ip.txt','w') as f:
+			    ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipaddress']
+			    f.write('{}'.format(ip))
+			    b = Bridge(ip)
+			    print('new ip found (ignore)\n')
+	    else: # linux
 	    	with open('/home/jp/pha/ip.txt','w') as f:
-	    		   ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipaddress']
-	    		   f.write('{}'.format(ip))
-	    		   b = Bridge(ip)
-	    		   print('new ip found (ignore)\n')
+			    ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipaddress']
+			    f.write('{}'.format(ip))
+			    b = Bridge(ip)
+			    print('new ip found (ignore)\n')
 	return b
 
 b = read_ip()
-lights = b.get_light_objects('id')
-serial_data = serial.Serial('/dev/ttyACM0',9600)
+lights = b.get_light_objects('id') # lista das luzes
+if (os.name == 'nt'): # windows
+	serial_data = serial.Serial('com3',9600)
+else: # linux
+	serial_data = serial.Serial('/dev/ttyACM0',9600)
 h = datetime.datetime.now()
 
 def print_now():
@@ -36,10 +50,14 @@ def timer(hr,m):
 		return False
 
 # add if para windows/linux
-def scrape_ip():
-	ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipadress']
-	with open('/home/jp/pha/ip.txt','w') as f:
-		f.write('{}'.format(ip))
+# def scrape_ip():
+# 	ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipadress']
+# 	if (os.name == 'nt'):
+# 		with open('C:/scrape/ip.txt','w') as f:
+# 			f.write('{}'.format(ip))
+# 	else:
+# 	    with open('/home/jp/pha/ip.txt','w') as f:
+# 	        f.write('{}'.format(ip))
 
 def sensor(hr=18,m=0):
 	while True:
@@ -166,8 +184,11 @@ while True:
 	elif (len(v) == 2):
 		try:
 			float(v[1])
+			print(v[1])
 			if (type(v[0]) == str and type(float(v[1])) == float):
-				do_light(bd=v[0],brilho=v[1])
+				if (v[0] == 'b'):
+					print('ay')
+					lights[1].brightness = v[1]
 		except ValueError:
 			if (type(v[0]) == str and type(v[1]) == str):
 				if (v[0] == 'b' and v[1] == 'd' or v[0] == 'd' and v[1] == 'b'):
