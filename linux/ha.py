@@ -2,8 +2,6 @@
 import serial, datetime, os, requests
 from phue import Bridge
 
-## criar funcao p/ deixar qlqr luz em branco
-
 def read_ip():
 	try:
 		with open('/home/jp/pha/ip.txt', 'r') as f:
@@ -67,21 +65,21 @@ def sensor(hr=18,m=0):
 				else:
 					print('sol')
 
-def do_light(bd=0,c1=0,d=0,c2=0):
+def do_light(bd=0,c1=0,d=0,c2=0,brilho=254):
 	list = [bd,c1,d,c2]
 	list_t = []
 	for i in range(len(list)):
 		if(list[i] != 0):
 			i+=1
 			list_t.append(i)
-	print('selected:',list_t,end='\n\n')
+	print('selected',list_t,end='\n')
 
 	if (len(list_t) == 1):
 		if (b.get_light(list_t[0], 'on') == True):
 			b.set_light(list_t[0], 'on', False, transitiontime=0)
 		else:
 			b.set_light(list_t[0], 'on', True, transitiontime=0)
-			lights[list_t[0]].brightness=254
+			lights[list_t[0]].brightness=brilho
 
 	elif (len(list_t) == 2):
 		if (b.get_light(list_t[0],'on') == True or b.get_light(list_t[1]) == True):
@@ -90,8 +88,8 @@ def do_light(bd=0,c1=0,d=0,c2=0):
 		else:
 			b.set_light(list_t[0],'on', True, transitiontime=0)
 			b.set_light(list_t[1],'on', True, transitiontime=0)
-			lights[list_t[0]].brightness=254
-			lights[list_t[1]].brightness=254
+			lights[list_t[0]].brightness=brilho
+			lights[list_t[1]].brightness=brilho
 
 	elif (len(list_t) == 3):
 		if (b.get_light(list_t[0],'on') == True or b.get_light(list_t[1]) == True or b.get_light(list_t[2]) == True):
@@ -102,9 +100,9 @@ def do_light(bd=0,c1=0,d=0,c2=0):
 			b.set_light(list_t[0],'on', True, transitiontime=0)
 			b.set_light(list_t[1],'on', True, transitiontime=0)
 			b.set_light(list_t[2],'on', True, transitiontime=0)
-			lights[list_t[0]].brightness=254
-			lights[list_t[1]].brightness=254
-			lights[list_t[2]].brightness=254
+			lights[list_t[0]].brightness=brilho
+			lights[list_t[1]].brightness=brilho
+			lights[list_t[2]].brightness=brilho
 
 	elif (len(list_t) == 4):
 		if(b.get_light(list_t[0],'on') == True or b.get_light(list_t[1],'on') == True or b.get_light(list_t[2],'on') == True or b.get_light(list_t[3],'on') == True):
@@ -117,33 +115,51 @@ def do_light(bd=0,c1=0,d=0,c2=0):
 			b.set_light(list_t[1],'on', True, transitiontime=0)
 			b.set_light(list_t[2],'on', True, transitiontime=0)
 			b.set_light(list_t[3],'on', True, transitiontime=0)
-			lights[list_t[0]].brightness=254
-			lights[list_t[1]].brightness=254
-			lights[list_t[2]].brightness=254
-			lights[list_t[3]].brightness=254
+			lights[list_t[0]].brightness=brilho
+			lights[list_t[1]].brightness=brilho
+			lights[list_t[2]].brightness=brilho
+			lights[list_t[3]].brightness=brilho
+	os.system('cls' if os.name == 'nt' else 'clear')
+# def make_cor(bd=0,c1=0,d=0,c2=0):
 
-do_light(0,0,1,0)
-
+os.system('cls' if os.name == 'nt' else 'clear')
 while True:
-	usr = input('[1] turn on sensor\n[2] set hour\n\n>> ')
-	if(usr == '1'): # LIGA O SENSOR
-		try:
-			b = read_ip()
-			lights = b.get_light_objects('id')
-			os.system('cls')
-			sensor()
-		except KeyboardInterrupt:
-			os.system('cls')
-			pass
+	usr = input('\n[1] turn on sensor\n[2] set hour\n\n>> ')
+	v = usr.split()
+	# print(v)
+	if (len(usr) == 1):
 
-	elif(usr == '2'): # ALTERA A HORA
-		try:
-			os.system('cls')
-			hr = int(input('>> h: '))
-			mi = int(input('>> m: '))
-			print('ok')
-			os.system('cls')
-			sensor(hr,mi)
-		except KeyboardInterrupt:
-			os.system('cls')
-			pass
+		if(usr == '1'): # LIGA O SENSOR
+			try:
+				b = read_ip()
+				lights = b.get_light_objects('id')
+				os.system('cls')
+				sensor()
+			except KeyboardInterrupt:
+				os.system('cls')
+				pass
+
+		elif(usr == '2'): # ALTERA A HORA
+			try:
+				os.system('cls')
+				hr = int(input('>> h: '))
+				mi = int(input('>> m: '))
+				print('ok')
+				os.system('cls')
+				sensor(hr,mi)
+			except KeyboardInterrupt:
+				os.system('cls')
+				pass
+
+		elif(usr == 'c'):
+			do_light(c1=1,c2=1)
+		elif(usr == 'b'):
+			do_light(bd=1)
+		elif(usr == 'd'):
+			do_light(d=1)
+		elif(usr == 'c1'):
+			do_light(c1=1)
+		elif(usr == 'c2'):
+			do_light(c2=1)
+
+	# se len(usr) == 2 -> c [brilho]
