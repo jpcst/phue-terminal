@@ -5,7 +5,7 @@ from phue import Bridge
 def read_ip():
 	try:
 		if (os.name == 'nt'): # windows
-			with open('C:/scrape/ip.txt','w') as f:
+			with open('C:/phue/ip.txt','w') as f:
 				b = Bridge(f.read())
 				b.connect()
 		else: # linux
@@ -14,7 +14,7 @@ def read_ip():
 			    b.connect()
 	except Exception as e: # se erro no IP, scrapar novo
 	    if (os.name == 'nt'): # windows
-	    	with open('C:/scrape/ip.txt','w') as f:
+	    	with open('C:/phue/ip.txt','w') as f:
 			    ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipaddress']
 			    f.write('{}'.format(ip))
 			    b = Bridge(ip)
@@ -30,7 +30,7 @@ def read_ip():
 b = read_ip()
 lights = b.get_light_objects('id') # lista das luzes
 if (os.name == 'nt'): # windows
-	serial_data = serial.Serial('com3',9600)
+	serial_data = serial.Serial('COM3',9600)
 else: # linux
 	serial_data = serial.Serial('/dev/ttyACM0',9600)
 h = datetime.datetime.now()
@@ -48,16 +48,6 @@ def timer(hr,m):
 		return True
 	else:
 		return False
-
-# add if para windows/linux
-# def scrape_ip():
-# 	ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipadress']
-# 	if (os.name == 'nt'):
-# 		with open('C:/scrape/ip.txt','w') as f:
-# 			f.write('{}'.format(ip))
-# 	else:
-# 	    with open('/home/jp/pha/ip.txt','w') as f:
-# 	        f.write('{}'.format(ip))
 
 def sensor(hr=18,m=0):
 	while True:
@@ -143,14 +133,19 @@ def do_light(bd=0,c1=0,d=0,c2=0,brilho=254,tt=0,set=True):
 			lights[list_t[2]].brightness=brilho
 			lights[list_t[3]].brightness=brilho
 	os.system('cls' if os.name == 'nt' else 'clear')
-	return list_t,brilho,tt,set
+	perc = brilho/254 * 100
+	return list_t, brilho, perc, set, tt
+
+def print_light(bd=0,c1=0,d=0,c2=0,brilho=254,tt=0,set=True):
+	x = do_light(bd,c1,d,c2,brilho,tt,set)
+	print(x[0],' at ',round(x[2]),'% (',x[1],') ',x[3],sep='')
 
 # def make_cor(bd=0,c1=0,d=0,c2=0):
 # integrar essa func em do_light
 
 os.system('cls' if os.name == 'nt' else 'clear')
 while True:
-	usr = input('\n[1] turn on sensor\n[2] set hour\n\n>> ')
+	usr = input('\n(1) turn on sensor\n(2) set hour\n\n>> ')
 	v = usr.split(' ')
 	if (len(v) == 1): # RODA SE INPUT = [0]
 		if(usr == '1'): # LIGA O SENSOR NA HORA DEFAULT
@@ -177,21 +172,21 @@ while True:
 		# LIGA APENAS UM GRUPO DE LUZ NO BRILHO E TT DEFAULT
 		elif(usr == 'c'): # LIGA ALL TETO
 			# os.system('cls' if os.name == 'nt' else 'clear')
-			print(do_light(c1=1,c2=1))
+			print_light(c1=1,c2=1)
 		elif(usr == 'b'): # LIGA BED
 			# os.system('cls' if os.name == 'nt' else 'clear')
-			print(do_light(bd=1))
+			print_light(bd=1)
 		elif(usr == 'd'): # LIGA DESK
 			# os.system('cls' if os.name == 'nt' else 'clear')
-			print(do_light(d=1))
+			print_light(d=1)
 		elif(usr == 'c1'): # LIGA TETO 1
 			# os.system('cls' if os.name == 'nt' else 'clear')
-			print(do_light(c1=1))
+			print_light(c1=1)
 		elif(usr == 'c2'): # LIGA TETO 2
 			# os.system('cls' if os.name == 'nt' else 'clear')
-			print(do_light(c2=1))
+			print_light(c2=1)
 		elif(usr == 'all'): # LIGA TODAS
-			print(do_light(1,1,1,1))
+			print_light(1,1,1,1)
 			# os.system('cls' if os.name == 'nt' else 'clear')
 		else:
 			os.system('cls' if os.name == 'nt' else 'clear')
@@ -202,15 +197,16 @@ while True:
 			if (type(v[0]) == str and type(float(v[1])) == float): # SE INPUT = [d, float] -> luz e brilho
 				x = 254 * float(v[1])
 				if (v[0] == 'b'): # CONTROLA CAMA E SEU BRILHO
-					if (b.get_light(1,'on') == True):
+					if (b.get_light(1,'on') == True): # qnd cama on
 						os.system('cls' if os.name == 'nt' else 'clear')
 						print(v[0],' -> ',int(x),', ',float(v[1]) * 100,'%',sep='')
 						lights[1].brightness = int(x)
 						# fazer para outras combinacoes
-					else:
+					else: # qnd cama off
 						os.system('cls' if os.name == 'nt' else 'clear')
 						print(v[0],' -> ',int(x),', ',float(v[1]) * 100,'%',sep='')
-						print(do_light(bd=1,brilho=int(x)))
+						# print(do_light(bd=1,brilho=int(x)))
+						print_light(bd=1,brilho=int(x))
 						# lights[1].brightness = int(x)
 				if (v[0] == 'c'): # CONTROLA ALL TETO E SEU BRILHO
 					if (b.get_light(2,'on') == True or b.get_light(4,'on') == True):
