@@ -85,7 +85,7 @@ def sensor(hr=18,m=0):
 				else:
 					print('sol')
 
-def do_light(bd=0,c1=0,d=0,c2=0,brilho=254):
+def do_light(bd=0,c1=0,d=0,c2=0,brilho=254,tt=0,set=True):
 	list = [bd,c1,d,c2]
 	list_t = []
 	for i in range(len(list)):
@@ -95,50 +95,55 @@ def do_light(bd=0,c1=0,d=0,c2=0,brilho=254):
 	# print('selected',list_t,end='\n')
 	if (len(list_t) == 1):
 		if (b.get_light(list_t[0], 'on') == True):
-			b.set_light(list_t[0], 'on', False, transitiontime=0)
+			b.set_light(list_t[0], 'on', False, transitiontime=tt)
+			set = False
 		else:
-			b.set_light(list_t[0], 'on', True, transitiontime=0)
+			b.set_light(list_t[0], 'on', True, transitiontime=tt)
 			lights[list_t[0]].brightness=brilho
 
 	elif (len(list_t) == 2):
 		if (b.get_light(list_t[0],'on') == True or b.get_light(list_t[1]) == True):
-			b.set_light(list_t[0],'on', False, transitiontime=0)
-			b.set_light(list_t[1],'on', False, transitiontime=0)
+			b.set_light(list_t[0],'on', False, transitiontime=tt)
+			b.set_light(list_t[1],'on', False, transitiontime=tt)
+			set = False
 		else:
-			b.set_light(list_t[0],'on', True, transitiontime=0)
-			b.set_light(list_t[1],'on', True, transitiontime=0)
+			b.set_light(list_t[0],'on', True, transitiontime=tt)
+			b.set_light(list_t[1],'on', True, transitiontime=tt)
 			lights[list_t[0]].brightness=brilho
 			lights[list_t[1]].brightness=brilho
 
 	elif (len(list_t) == 3):
 		if (b.get_light(list_t[0],'on') == True or b.get_light(list_t[1]) == True or b.get_light(list_t[2]) == True):
-			b.set_light(list_t[0],'on', False, transitiontime=0)
-			b.set_light(list_t[1],'on', False, transitiontime=0)
-			b.set_light(list_t[2],'on', False, transitiontime=0)
+			b.set_light(list_t[0],'on', False, transitiontime=tt)
+			b.set_light(list_t[1],'on', False, transitiontime=tt)
+			b.set_light(list_t[2],'on', False, transitiontime=tt)
+			set = False
 		else:
-			b.set_light(list_t[0],'on', True, transitiontime=0)
-			b.set_light(list_t[1],'on', True, transitiontime=0)
-			b.set_light(list_t[2],'on', True, transitiontime=0)
+			b.set_light(list_t[0],'on', True, transitiontime=tt)
+			b.set_light(list_t[1],'on', True, transitiontime=tt)
+			b.set_light(list_t[2],'on', True, transitiontime=tt)
 			lights[list_t[0]].brightness=brilho
 			lights[list_t[1]].brightness=brilho
 			lights[list_t[2]].brightness=brilho
 
 	elif (len(list_t) == 4):
 		if(b.get_light(list_t[0],'on') == True or b.get_light(list_t[1],'on') == True or b.get_light(list_t[2],'on') == True or b.get_light(list_t[3],'on') == True):
-			b.set_light(list_t[0],'on', False, transitiontime=0)
-			b.set_light(list_t[1],'on', False, transitiontime=0)
-			b.set_light(list_t[2],'on', False, transitiontime=0)
-			b.set_light(list_t[3],'on', False, transitiontime=0)
+			b.set_light(list_t[0],'on', False, transitiontime=tt)
+			b.set_light(list_t[1],'on', False, transitiontime=tt)
+			b.set_light(list_t[2],'on', False, transitiontime=tt)
+			b.set_light(list_t[3],'on', False, transitiontime=tt)
+			set = False
 		else:
-			b.set_light(list_t[0],'on', True, transitiontime=0)
-			b.set_light(list_t[1],'on', True, transitiontime=0)
-			b.set_light(list_t[2],'on', True, transitiontime=0)
-			b.set_light(list_t[3],'on', True, transitiontime=0)
+			b.set_light(list_t[0],'on', True, transitiontime=tt)
+			b.set_light(list_t[1],'on', True, transitiontime=tt)
+			b.set_light(list_t[2],'on', True, transitiontime=tt)
+			b.set_light(list_t[3],'on', True, transitiontime=tt)
 			lights[list_t[0]].brightness=brilho
 			lights[list_t[1]].brightness=brilho
 			lights[list_t[2]].brightness=brilho
 			lights[list_t[3]].brightness=brilho
 	os.system('cls' if os.name == 'nt' else 'clear')
+	return list_t,brilho,tt,set
 
 # def make_cor(bd=0,c1=0,d=0,c2=0):
 # integrar essa func em do_light
@@ -147,7 +152,7 @@ os.system('cls' if os.name == 'nt' else 'clear')
 while True:
 	usr = input('\n[1] turn on sensor\n[2] set hour\n\n>> ')
 	v = usr.split(' ')
-	if (len(v) == 1):
+	if (len(v) == 1): # RODA SE INPUT = [0]
 		if(usr == '1'): # LIGA O SENSOR NA HORA DEFAULT
 			try:
 				b = read_ip()
@@ -169,35 +174,64 @@ while True:
 			except KeyboardInterrupt:
 				os.system('cls')
 				pass
+		# LIGA APENAS UM GRUPO DE LUZ NO BRILHO E TT DEFAULT
 		elif(usr == 'c'): # LIGA ALL TETO
-			do_light(c1=1,c2=1)
+			# os.system('cls' if os.name == 'nt' else 'clear')
+			print(do_light(c1=1,c2=1))
 		elif(usr == 'b'): # LIGA BED
-			do_light(bd=1)
+			# os.system('cls' if os.name == 'nt' else 'clear')
+			print(do_light(bd=1))
 		elif(usr == 'd'): # LIGA DESK
-			do_light(d=1)
+			# os.system('cls' if os.name == 'nt' else 'clear')
+			print(do_light(d=1))
 		elif(usr == 'c1'): # LIGA TETO 1
-			do_light(c1=1)
+			# os.system('cls' if os.name == 'nt' else 'clear')
+			print(do_light(c1=1))
 		elif(usr == 'c2'): # LIGA TETO 2
-			do_light(c2=1)
+			# os.system('cls' if os.name == 'nt' else 'clear')
+			print(do_light(c2=1))
+		elif(usr == 'all'): # LIGA TODAS
+			print(do_light(1,1,1,1))
+			# os.system('cls' if os.name == 'nt' else 'clear')
+		else:
+			os.system('cls' if os.name == 'nt' else 'clear')
+			print(usr, 'is not defined')
 
-
-	elif (len(v) == 2):
+	elif (len(v) == 2): # RODA SE INPUT = [0,1]
 		try:
-			float(v[1])
-			print(v[1])
-			if (type(v[0]) == str and type(float(v[1])) == float):
-				if (v[0] == 'b'):
-					print('ay')
-					lights[1].brightness = v[1]
+			if (type(v[0]) == str and type(float(v[1])) == float): # SE INPUT = [d, float] -> luz e brilho
+				x = 254 * float(v[1])
+				if (v[0] == 'b'): # CONTROLA CAMA E SEU BRILHO
+					if (b.get_light(1,'on') == True):
+						os.system('cls' if os.name == 'nt' else 'clear')
+						print(v[0],' -> ',int(x),', ',float(v[1]) * 100,'%',sep='')
+						lights[1].brightness = int(x)
+						# fazer para outras combinacoes
+					else:
+						os.system('cls' if os.name == 'nt' else 'clear')
+						print(v[0],' -> ',int(x),', ',float(v[1]) * 100,'%',sep='')
+						print(do_light(bd=1,brilho=int(x)))
+						# lights[1].brightness = int(x)
+				if (v[0] == 'c'): # CONTROLA ALL TETO E SEU BRILHO
+					if (b.get_light(2,'on') == True or b.get_light(4,'on') == True):
+						os.system('cls' if os.name == 'nt' else 'clear')
+						print(v[0],' -> ',int(x),', ',float(v[1]) * 100,'%',sep='')
+						lights[2].brightness = int(x)
+						lights[4].brightness = int(x)
+					else:
+						os.system('cls' if os.name == 'nt' else 'clear')
+						print(v[0],' -> ',int(x),', ',float(v[1]) * 100,'%',sep='')
+						print(do_light(c1=1,c2=1,brilho=int(x)))
+
 		except ValueError:
-			if (type(v[0]) == str and type(v[1]) == str):
+			if (type(v[0]) == str and type(v[1]) == str): # SE INPUT = [d, b] -> luz e luz, brilho default
 				if (v[0] == 'b' and v[1] == 'd' or v[0] == 'd' and v[1] == 'b'):
 					do_light(bd=1,d=1)
 				#fazer para as outras combinacoes
 
-
 	elif (len(v) == 3):
 		pass
+
 
 	elif (len(v) == 4):
 		pass
