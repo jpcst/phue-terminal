@@ -75,6 +75,7 @@ def sensor(hr=18,m=0):
 				else:
 					print('sol')
 
+list_t = [b.get_light(1,'on'), b.get_light(2,'on'), b.get_light(3,'on'), b.get_light(4,'on')]
 def do_light(bd=0,c1=0,d=0,c2=0,brilho=254,tt=0,set=True):
 	list = [bd,c1,d,c2]
 	list_t = []
@@ -140,34 +141,74 @@ def print_light(bd=0,c1=0,d=0,c2=0,brilho=254,tt=0,set=True):
 	x = do_light(bd,c1,d,c2,brilho,tt,set)
 	print(x[0],' at ',round(x[2]),'% (',x[1],') ',x[3],sep='')
 
+def controle():
+	while True:
+		if (serial_data.inWaiting() > 0):
+			my_data = serial_data.readline().decode().strip()
+			print(my_data)
+			if (my_data == 'FFA25D'): # Numero 1 - bed
+				print_light(1)
+			elif (my_data == 'FF629D'): # Numero 2 - teto
+				print_light(c1=1,c2=1)
+			elif (my_data == 'FFE21D'): # Numero 3 - dek
+				print_light(d=1)
+			elif (my_data == 'FF18E7'): # + BRILHO
+				for l in range(len(list_t)):
+					if (list_t[l] == True):
+						l+=1
+						list_t2 = []
+						list_t2.append(l)
+						# print(list_t2)
+						for i in range(len(list_t2)):
+							print(list_t2)
+							lights[list_t2[i]].brightness += 30
+							print(lights[list_t2[i]].brightness)
+			elif (my_data == 'FF4AB5'): # - BRILHO
+				for l in range(len(list_t)):
+					if (list_t[l] == True):
+						l+=1
+						list_t2 = []
+						list_t2.append(l)
+						print(list_t2)
+						for i in range(len(list_t2)):
+							lights[list_t2[i]].brightness -= 30
+							print(lights[list_t2[i]].brightness)
+
 # def make_cor(bd=0,c1=0,d=0,c2=0):
 # integrar essa func em do_light
 
 os.system('cls' if os.name == 'nt' else 'clear')
 while True:
-	usr = input('\n(1) turn on sensor\n(2) set hour\n\n>> ')
+	usr = input('\n(1) turn on sensor\n(2) set hour\n(3) controller\n\n>> ')
 	v = usr.split(' ')
 	if (len(v) == 1): # RODA SE INPUT = [0]
 		if(usr == '1'): # LIGA O SENSOR NA HORA DEFAULT
 			try:
 				b = read_ip()
 				lights = b.get_light_objects('id')
-				os.system('cls')
+				os.system('cls' if os.name == 'nt' else 'clear')
 				sensor()
 			except KeyboardInterrupt:
-				os.system('cls')
+				os.system('cls' if os.name == 'nt' else 'clear')
 				pass
 
 		elif(usr == '2'): # ALTERA A HORA E LIGA SENSOR
 			try:
-				os.system('cls')
+				os.system('cls' if os.name == 'nt' else 'clear')
 				hr = int(input('>> h: '))
 				mi = int(input('>> m: '))
 				print('ok')
-				os.system('cls')
+				os.system('cls' if os.name == 'nt' else 'clear')
 				sensor(hr,mi)
 			except KeyboardInterrupt:
-				os.system('cls')
+				os.system('cls' if os.name == 'nt' else 'clear')
+				pass
+		elif(usr == '3'):
+			try:
+				os.system('cls' if os.name == 'nt' else 'clear')
+				controle()
+			except KeyboardInterrupt:
+				os.system('cls' if os.name == 'nt' else 'clear')
 				pass
 		# LIGA APENAS UM GRUPO DE LUZ NO BRILHO E TT DEFAULT
 		elif(usr == 'c'): # LIGA ALL TETO
@@ -218,6 +259,18 @@ while True:
 						os.system('cls' if os.name == 'nt' else 'clear')
 						print(v[0],' -> ',int(x),', ',float(v[1]) * 100,'%',sep='')
 						print(do_light(c1=1,c2=1,brilho=int(x)))
+				if (v[0] == 'd'): # CONTROLA DESJ E SEU BRILHO
+					if (b.get_light(3,'on') == True): # qnd cama on
+						os.system('cls' if os.name == 'nt' else 'clear')
+						print(v[0],' -> ',int(x),', ',float(v[1]) * 100,'%',sep='')
+						lights[3].brightness = int(x)
+						# fazer para outras combinacoes
+					else: # qnd cama off
+						os.system('cls' if os.name == 'nt' else 'clear')
+						print(v[0],' -> ',int(x),', ',float(v[1]) * 100,'%',sep='')
+						# print(do_light(bd=1,brilho=int(x)))
+						print_light(d=1,brilho=int(x))
+						# lights[1].brightness = int(x)
 
 		except ValueError:
 			if (type(v[0]) == str and type(v[1]) == str): # SE INPUT = [d, b] -> luz e luz, brilho default
@@ -236,4 +289,4 @@ while True:
 
 
 
-	# se len(usr) == 2 -> c [brilho]
+# se len(usr) == 2 -> c [brilho]
