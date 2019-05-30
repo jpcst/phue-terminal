@@ -1,9 +1,10 @@
+#!/usr/bin/python3
 from tkinter import *
 from phue import Bridge
 import requests
 
 try:
-    with open('C:/Scrape/hue.txt', 'r') as f:
+    with open('/home/jp/pha/ip.txt', 'r') as f:
         b = Bridge(f.read())  # Scrapa o ip do .txt no arg
         b.connect()
         print('IP FROM HUE.TXT')
@@ -13,14 +14,14 @@ except Exception as read_err:
     print('IP FROM MEETHUE.COM')
     ip = requests.get('https://www.meethue.com/api/nupnp') \
         .json()[0]['internalipaddress']  # Scrapa o ip da API
-    with open('C:/Scrape/hue.txt', 'w') as f:
+    with open('/home/jp/pha/ip.txt', 'w') as f:
         f.write('{}'.format(ip))  # Salva o ip em hue.txt
         b = Bridge(ip)
         b.connect()
 else:
     pass
 finally:
-    with open('C:/Scrape/hue.txt', 'r') as f:
+    with open('/home/jp/pha/ip.txt', 'r') as f:
         print(f.read())
 
 root = Tk()
@@ -34,8 +35,8 @@ def tres():
 	lights[3].brightness=254
 	#luzes = b.get_light_objects()
 	for luz in b.get_light_objects(): # = luzes
-		luz.xy=[.3, .3]
-
+		luz.xy=[.3, .3] # https://www.ledtuning.nl/en/cie-convertor
+		# luz.ct=100 # https://www.ledtuning.nl/en/cie-convertor
 def off():
 	b.set_light([1,2,3,4], 'on', False, transitiontime=0) # Lista de luzes = [1,2,3,4]
 
@@ -43,10 +44,12 @@ def cor():
 	b.set_light(1, 'on', True, transitiontime=0)
 	lights[3].brightness=254
 	for luz in b.get_light_objects():
-		luz.xy=[.7, .75]
-
+         # luz.xy=[.7, .75]
+         # luz.xy=[0.6,0.5]
+         luz.hue=33
+         luz.saturation = 20
 def teto():
-	teto1 = b.get_light(2,'on') 
+	teto1 = b.get_light(2,'on')
 	teto2 = b.get_light(4,'on') # True = on, False = off
 	tetos = [teto1,teto2]
 	if(tetos[0] == True or tetos[1] == True):
