@@ -146,13 +146,13 @@ def controle():
 		if (serial_data.inWaiting() > 0):
 			my_data = serial_data.readline().decode().strip()
 			print(my_data)
-			if (my_data == 'FFA25D'): # Numero 1 - bed
+			if (my_data == '3810010624.0000000000000000' or my_data == '16753245.0000000000000000' or my_data == '1110306816.0000000000000000'): # Numero 1 - bed
 				print_light(1)
-			elif (my_data == 'FF629D'): # Numero 2 - teto
+			elif (my_data == '5316027.0000000000000000' or my_data == '16736925.0000000000000000' or my_data == '217272064.0000000000000000'): # Numero 2 - teto
 				print_light(c1=1,c2=1)
-			elif (my_data == 'FFE21D'): # Numero 3 - dek
+			elif (my_data == '793245056.0000000000000000'): # Numero 3 - dek
 				print_light(d=1)
-			elif (my_data == 'FF18E7'): # + BRILHO
+			elif (my_data == '3770708992.0000000000000000'): # + BRILHO
 				for l in range(len(list_t)):
 					if (list_t[l] == True):
 						l+=1
@@ -163,7 +163,7 @@ def controle():
 							print(list_t2)
 							lights[list_t2[i]].brightness += 30
 							print(lights[list_t2[i]].brightness)
-			elif (my_data == 'FF4AB5'): # - BRILHO
+			elif (my_data == '3131087104.0000000000000000'): # - BRILHO
 				for l in range(len(list_t)):
 					if (list_t[l] == True):
 						l+=1
