@@ -152,6 +152,36 @@ def controle():
 				print_light(c1=1,c2=1)
 			elif (my_data == '793245056.0000000000000000'): # Numero 3 - dek
 				print_light(d=1)
+			elif (my_data == '2427810048.0000000000000000'): # NUmero 4 - liga tudo
+				print_light(1,1,1,1)
+			elif (my_data == '3515284992.0000000000000000'): # PB - seta bed em amarelo
+				if (b.get_light(1,'on') == True):
+					lights[1].hue = 33
+					lights[1].saturation = 20
+				else:
+					do_light(1)
+					lights[1].hue = 33
+					lights[1].saturation = 20
+			elif (my_data == '4091398400.0000000000000000'): # AUTO - seta ligadas em branco
+				for l in range(len(list_t)):
+					if (list_t[l] == True):
+						l+=1
+						list_t2 = []
+						list_t2.append(l)
+						print(list_t2)
+						for i in range(len(list_t2)):
+							lights[list_t2[i]].xy = [.3,.3]
+							# lights[list_t2[i]].brightness = 254
+			elif (my_data == '3584051968.0000000000000000'): # EM BAIXO DE AUTO - seta ligadas em 254
+				for l in range(len(list_t)):
+					if (list_t[l] == True):
+						l+=1
+						list_t2 = []
+						list_t2.append(l)
+						print(list_t2)
+						for i in range(len(list_t2)):
+							lights[list_t2[i]].brightness = 254
+
 			elif (my_data == '3770708992.0000000000000000'): # + BRILHO
 				for l in range(len(list_t)):
 					if (list_t[l] == True):
@@ -163,7 +193,7 @@ def controle():
 							print(list_t2)
 							lights[list_t2[i]].brightness += 30
 							print(lights[list_t2[i]].brightness)
-			elif (my_data == '3131087104.0000000000000000'): # - BRILHO
+			elif (my_data == 'ovf'): # - BRILHO
 				for l in range(len(list_t)):
 					if (list_t[l] == True):
 						l+=1
@@ -171,7 +201,7 @@ def controle():
 						list_t2.append(l)
 						print(list_t2)
 						for i in range(len(list_t2)):
-							lights[list_t2[i]].brightness -= 30
+							lights[list_t2[i]].brightness -= 25
 							print(lights[list_t2[i]].brightness)
 
 # def make_cor(bd=0,c1=0,d=0,c2=0):
@@ -274,8 +304,16 @@ while True:
 
 		except ValueError:
 			if (type(v[0]) == str and type(v[1]) == str): # SE INPUT = [d, b] -> luz e luz, brilho default
-				if (v[0] == 'b' and v[1] == 'd' or v[0] == 'd' and v[1] == 'b'):
+				if (v[0] == 'b' and v[1] == 'd' or v[0] == 'd' and v[1] == 'b'): # liga/desliga bed e desk
 					do_light(bd=1,d=1)
+				if (v[0] == 'b' and v[1] == 'am'): # liga/desliga bed em amarelo
+					if (b.get_light(1,'on') == True):
+						lights[1].hue = 33
+						lights[1].saturation = 20
+					else:
+						do_light(1)
+						lights[1].hue = 33
+						lights[1].saturation = 20
 				#fazer para as outras combinacoes
 
 	elif (len(v) == 3):
