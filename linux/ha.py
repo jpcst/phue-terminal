@@ -10,21 +10,21 @@ def read_ip():
 				b.connect()
 		else: # linux
 			with open('/home/jp/pha/ip.txt', 'r') as f:
-			    b = Bridge(f.read())
-			    b.connect()
+				b = Bridge(f.read())
+				b.connect()
 	except Exception as e: # se erro no IP, scrapar novo
-	    if (os.name == 'nt'): # windows
-	    	with open('C:/phue/ip.txt','w') as f:
-			    ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipaddress']
-			    f.write('{}'.format(ip))
-			    b = Bridge(ip)
-			    print('new ip found (ignore)\n')
-	    else: # linux
-	    	with open('/home/jp/pha/ip.txt','w') as f:
-			    ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipaddress']
-			    f.write('{}'.format(ip))
-			    b = Bridge(ip)
-			    print('new ip found (ignore)\n')
+		if (os.name == 'nt'): # windows
+			with open('C:/phue/ip.txt','w') as f:
+				ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipaddress']
+				f.write('{}'.format(ip))
+				b = Bridge(ip)
+				print('new ip found (ignore)\n')
+		else: # linux
+			with open('/home/jp/pha/ip.txt','w') as f:
+				ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipaddress']
+				f.write('{}'.format(ip))
+				b = Bridge(ip)
+				print('new ip found (ignore)\n')
 	return b
 
 b = read_ip()
@@ -145,7 +145,7 @@ def controle():
 	while True:
 		if (serial_data.inWaiting() > 0):
 			my_data = serial_data.readline().decode().strip()
-			print(my_data)
+			print('controller:\n1 bed, 2 ceiling, 3 desk, 4 all\nPB bed yellow, AUTO on white, [][] on 100%','\n',my_data)
 			if (my_data == '3810010624.0000000000000000' or my_data == '16753245.0000000000000000' or my_data == '1110306816.0000000000000000'): # Numero 1 - bed
 				print_light(1)
 			elif (my_data == '5316027.0000000000000000' or my_data == '16736925.0000000000000000' or my_data == '217272064.0000000000000000'): # Numero 2 - teto
@@ -203,6 +203,7 @@ def controle():
 						for i in range(len(list_t2)):
 							lights[list_t2[i]].brightness -= 25
 							print(lights[list_t2[i]].brightness)
+			print('controller:\n1 bed, 2 ceiling, 3 desk, 4 all\nPB bed yellow, AUTO on white, [][] on 100%')
 
 # def make_cor(bd=0,c1=0,d=0,c2=0):
 # integrar essa func em do_light
