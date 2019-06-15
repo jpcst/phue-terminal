@@ -5,7 +5,7 @@ from phue import Bridge
 def read_ip():
 	try:
 		if (os.name == 'nt'): # windows
-			with open('C:/phue/ip.txt','w') as f:
+			with open('C:/phue/ip.txt','r') as f:
 				b = Bridge(f.read())
 				b.connect()
 		else: # linux
@@ -18,13 +18,13 @@ def read_ip():
 				ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipaddress']
 				f.write('{}'.format(ip))
 				b = Bridge(ip)
-				print('new ip found (ignore)\n')
+				print('new ip (ignore)\n')
 		else: # linux
 			with open('/home/jp/pha/ip.txt','w') as f:
 				ip = requests.get('https://www.meethue.com/api/nupnp').json()[0]['internalipaddress']
 				f.write('{}'.format(ip))
 				b = Bridge(ip)
-				print('new ip found (ignore)\n')
+				print('new ip (ignore)\n')
 	return b
 
 b = read_ip()
@@ -208,7 +208,7 @@ def controle():
 # def make_cor(bd=0,c1=0,d=0,c2=0):
 # integrar essa func em do_light
 
-os.system('cls' if os.name == 'nt' else 'clear')
+# os.system('cls' if os.name == 'nt' else 'clear')
 while True:
 	usr = input('\n(1) turn on sensor\n(2) set hour\n(3) controller\n\n>> ')
 	v = usr.split(' ')
