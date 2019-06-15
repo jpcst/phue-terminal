@@ -306,15 +306,38 @@ while True:
 		except ValueError:
 			if (type(v[0]) == str and type(v[1]) == str): # SE INPUT = [d, b] -> luz e luz, brilho default
 				if (v[0] == 'b' and v[1] == 'd' or v[0] == 'd' and v[1] == 'b'): # liga/desliga bed e desk
-					do_light(bd=1,d=1)
-				if (v[0] == 'b' and v[1] == 'am'): # liga/desliga bed em amarelo
+					print_light(bd=1,d=1)
+					# do_light(bd=1,d=1)
+				elif (v[0] == 'b' and v[1] == 'am'): # liga/desliga bed em amarelo
 					if (b.get_light(1,'on') == True):
 						lights[1].hue = 33
 						lights[1].saturation = 20
 					else:
-						do_light(1)
+						print_light(1)
 						lights[1].hue = 33
 						lights[1].saturation = 20
+				elif (v[0] == 'b' and v[1] == 'br'): # liga/desliga bed em branco
+					if (b.get_light(1,'on') == True):
+						lights[1].xy = [.3, .3] # seta 1 em branco
+					else:
+						# print_light(1)
+						print_light(1)
+						lights[1].xy = [.3, .3]
+				elif (v[0] == 'c' and v[1] == 'br'): # liga/desliga bed em branco
+					if (b.get_light(2,'on') == True or b.get_light(4, 'on') == True):
+						lights[2].xy = [.3, .3] # seta ceiling em branco
+						lights[4].xy = [.3, .3]
+					else:
+						# do_light(c1=1,c2=1)
+						print_light(c1=1,c2=1)
+						lights[2].xy = [.3, .3]
+						lights[4].xy = [.3, .3]
+				elif (v[0] == 'd' and v[1] == 'br'): #liga/desliga deks em branco
+					if (b.get_light(3,'on') == True):
+						lights[3].xy = [.3, .3]
+					else:
+						print_light(3)
+						lights[3].xy = [.3, .3]
 				#fazer para as outras combinacoes
 
 	elif (len(v) == 3):
