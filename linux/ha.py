@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import serial, datetime, os, requests
 from phue import Bridge
+from tkinter import *
 
 def read_ip():
 	try:
@@ -76,6 +77,7 @@ def sensor(hr=18,m=0):
 					print('sol')
 
 list_t = [b.get_light(1,'on'), b.get_light(2,'on'), b.get_light(3,'on'), b.get_light(4,'on')]
+
 def do_light(bd=0,c1=0,d=0,c2=0,brilho=254,tt=0,set=True):
 	list = [bd,c1,d,c2]
 	list_t = []
@@ -205,15 +207,70 @@ def controle():
 							print(lights[list_t2[i]].brightness)
 			print('controller:\n1 bed, 2 ceiling, 3 desk, 4 all\nPB bed yellow, AUTO on white, [][] on 100%')
 
+def gui():
+	root = Tk()
+	horizontal_frame = Frame(root)
+	horizontal_frame.pack()
+	def all(): # desliga/liga todas em branco
+		do_light(1,1,1,1)
+		lights[1].xy = [.3, .3]
+		lights[2].xy = [.3, .3]
+		lights[3].xy = [.3, .3]
+		lights[4].xy = [.3, .3]
+	def cln(): # desliga/liga teto
+		do_light(c1=1,c2=1)
+	def desk(): # liga/desliga desk
+		do_light(d=1)
+		lights[3].xy = [.3, .3] # seta 1 em branco
+	def bed():
+		if (b.get_light(1,'on') == 'True'):
+			lights[1].hue = 33
+			lights[1].saturation = 20
+		else:
+			do_light(1)
+			lights[1].hue = 33
+			lights[1].saturation = 20
+	for light_id in lights:
+		channel_frame = Frame(horizontal_frame)
+		channel_frame.pack(side = LEFT)
+
+		scale_command = lambda x, light_id=light_id: b.set_light(light_id,{'bri': int(x), 'transitiontime': 0})
+		scale = Scale(channel_frame, from_ = 254, to = 0, command = scale_command, length = 200, showvalue = 1)
+		scale.set(b.get_light(light_id,'bri'))
+		scale.pack()
+
+		button_var = BooleanVar()
+		button_var.set(b.get_light(light_id, 'on'))
+		button_command = lambda button_var=button_var, light_id=light_id: b.set_light(light_id, 'on', button_var.get())
+		button = Checkbutton(channel_frame, variable = button_var, command = button_command)
+		button.pack()
+
+		label = Label(channel_frame)
+		label.config(text = b.get_light(light_id,'name'))
+		label.pack()
+
+	action = Button(root,text=('cei'),command=cln)
+	action.pack(side='left')
+	action = Button(root,text=('bed'),command=bed)
+	action.pack(side='left')
+	action = Button(root,text=('dsk'),command=desk)
+	action.pack(side='left')
+	action = Button(root,text=('all'),command=all)
+	action.pack(side='left')
+	root.mainloop()
+
 # def make_cor(bd=0,c1=0,d=0,c2=0):
 # integrar essa func em do_light
 
-# os.system('cls' if os.name == 'nt' else 'clear')
+os.system('cls' if os.name == 'nt' else 'clear')
 while True:
-	usr = input('\n(1) turn on sensor\n(2) set hour\n(3) controller\n\n>> ')
+	usr = input('\n┌─┐\n│0├─ info\n│1├─ sensor\n│2├─ set hour\n│3├─ controller\n│4├─ gui\n└─┘\n\n>> ')
 	v = usr.split(' ')
 	if (len(v) == 1): # RODA SE INPUT = [0]
-		if(usr == '1'): # LIGA O SENSOR NA HORA DEFAULT
+		if(usr == '0'):
+			os.system('cls' if os.name == 'nt' else 'clear')
+			print('len 1: c, d, b, c1, c2, all\n\nlen 2: c [bright], d [bright], b [bright],\n       b [am], b [br], c [br], d [br],\n       b d, d b\n\nlen 3: c tt [time]\n') # 7 espaços
+		elif(usr == '1'): # LIGA O SENSOR NA HORA DEFAULT
 			try:
 				b = read_ip()
 				lights = b.get_light_objects('id')
@@ -238,6 +295,15 @@ while True:
 			try:
 				os.system('cls' if os.name == 'nt' else 'clear')
 				controle()
+			except KeyboardInterrupt:
+				os.system('cls' if os.name == 'nt' else 'clear')
+				pass
+
+		elif(usr == '4'):
+			try:
+				os.system('cls' if os.name == 'nt' else 'clear')
+				gui()
+				os.system('cls' if os.name == 'nt' else 'clear')
 			except KeyboardInterrupt:
 				os.system('cls' if os.name == 'nt' else 'clear')
 				pass
@@ -310,35 +376,48 @@ while True:
 					# do_light(bd=1,d=1)
 				elif (v[0] == 'b' and v[1] == 'am'): # liga/desliga bed em amarelo
 					if (b.get_light(1,'on') == True):
+						os.system('cls' if os.name == 'nt' else 'clear')
 						lights[1].hue = 33
 						lights[1].saturation = 20
+						# print_light(bd=1,set=False)
 					else:
-						print_light(1)
+						# os.system('cls' if os.name == 'nt' else 'clear')
+						print_light(bd=1)
 						lights[1].hue = 33
 						lights[1].saturation = 20
 				elif (v[0] == 'b' and v[1] == 'br'): # liga/desliga bed em branco
 					if (b.get_light(1,'on') == True):
+						os.system('cls' if os.name == 'nt' else 'clear')
 						lights[1].xy = [.3, .3] # seta 1 em branco
+						# print_light(bd=1,set=False)
 					else:
-						# print_light(1)
-						print_light(1)
+						os.system('cls' if os.name == 'nt' else 'clear')
+						print_light(bd=1)
 						lights[1].xy = [.3, .3]
 				elif (v[0] == 'c' and v[1] == 'br'): # liga/desliga bed em branco
 					if (b.get_light(2,'on') == True or b.get_light(4, 'on') == True):
+						os.system('cls' if os.name == 'nt' else 'clear')
 						lights[2].xy = [.3, .3] # seta ceiling em branco
 						lights[4].xy = [.3, .3]
+						print_light(bd=1,set=False)
 					else:
+						os.system('cls' if os.name == 'nt' else 'clear')
 						# do_light(c1=1,c2=1)
 						print_light(c1=1,c2=1)
 						lights[2].xy = [.3, .3]
 						lights[4].xy = [.3, .3]
 				elif (v[0] == 'd' and v[1] == 'br'): #liga/desliga deks em branco
 					if (b.get_light(3,'on') == True):
+						os.system('cls' if os.name == 'nt' else 'clear')
 						lights[3].xy = [.3, .3]
 					else:
-						print_light(3)
+						os.system('cls' if os.name == 'nt' else 'clear')
+						print_light(d=3)
 						lights[3].xy = [.3, .3]
 				#fazer para as outras combinacoes
+				else:
+					os.system('cls' if os.name == 'nt' else 'clear')
+					print(v[0],v[1],'is not defined')
 
 	elif (len(v) == 3):
 		pass
