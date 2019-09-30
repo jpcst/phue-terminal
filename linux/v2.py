@@ -12,24 +12,23 @@ dirWin = 'C:/phue/ip.txt'
 dirLin = '/home/jp/pha/ip.txt'
 
 
-def sys(c=0):  # Retorna o tipo de OS; Se c = 1, clear terminal.
-	if (c == 0):
-		if (os.name == 'nt'):
-			return 'win'
-		else:
-			return 'lin'
+def sys():  # Retorna o tipo de OS;
+	if (os.name == 'nt'):
+		return 'win'
 	else:
-		if (os.name == 'nt'):
-			os.system('cls')
-			return 'win'
-		else:
-			os.system('clear')
-			return 'lin'
+		return 'lin'
+	
+myOs = sys()
 
+def clear():	# Clear terminal
+	if myOs = 'win':
+		os.system('cls')
+	else:
+		os.system('clear')
 
 def read_ip():  # Le o ip no .txt e salva na var b ou scrapa ip novo e salva na var b.
 	try:
-		if (sys() == 'win'):  # Windows
+		if (myOs == 'win'):  # Windows
 			with open(dirWin, 'r') as f:
 				b = Bridge(f.read())
 				b.connect()
@@ -40,7 +39,7 @@ def read_ip():  # Le o ip no .txt e salva na var b ou scrapa ip novo e salva na 
 				b.connect()
 				# print('ip ok (lin)')
 	except Exception as e:  # Se erro no IP, scrapar novo da API
-		if (sys() == 'win'):  # Windows
+		if (myOs == 'win'):  # Windows
 			with open(dirWin, 'w') as f:
 				ip = requests.get(
 					'https://www.meethue.com/api/nupnp').json()[0]['internalipaddress']
@@ -62,7 +61,7 @@ b = read_ip()
 lights = b.get_light_objects('id')  # Lista das luzes [1,2,3,4]
 
 # Conecta o arduino com Python
-if (sys() == 'win'):
+if (myOs == 'win'):
 	serial_data = serial.Serial('COM3', 9600)
 	# print('COM3\n')
 else:
@@ -149,7 +148,7 @@ def check_state():
 
 # do_light(d=1,brilho=254,c=0)
 # print_light(d=1,c=0)
-sys(1)
+clear()
 # 18000 = 30 min
 # b.set_light([2,4], command)
 # command =  {'transitiontime' : 300, 'on' : True, 'bri' : 254}
@@ -164,23 +163,23 @@ while True:
 		##  Comandos para ligar as luzes  ##
 
 		if (usr == 'c'):  # Tetos
-			sys(1)
+			clear()
 			print_light(c1=1, c2=1)
 
 		elif (usr == 'b'):  # Bed
-			sys(1)
+			clear()
 			print_light(bd=1)
 
 		elif (usr == 'd'):  # Desk
-			sys(1)
+			clear()
 			print_light(d=1)
 
 		elif (usr == 'all'):  # Todas
-			sys(1)
+			clear()
 			print_light(1, 1, 1, 1)
 
 		elif (usr == '4'):  # Abre a GUI
-			sys(1)
+			clear()
 			gui()
 
 	elif (len(v) == 2):  # Input de tam 2
@@ -194,10 +193,10 @@ while True:
 				if (v[0] == 'b'):  # Controla bed e brilho
 
 					if (b.get_light(1, 'on') == True):  # Se cama on
-						sys(1)
+						clear()
 						lights[1].brightness = int(x)
 					else:
-						sys(1)
+						clear()
 						print_light(bd=1, brilho=int(x))
 
 		except ValueError:  # Roda se input é [str, str]
