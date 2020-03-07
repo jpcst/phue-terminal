@@ -1,7 +1,5 @@
 # !/usr/bin/python3
 
-# Last update 2020/03/07
-
 # 1: Bed (off)
 # 2: Ceil. 1
 # 3: Desk
@@ -11,7 +9,7 @@ import os
 import requests
 from phue import Bridge
 
-os.system('mode con cols=45 lines=15')
+os.system('mode con cols=50 lines=30')
 size = os.get_terminal_size().columns
 
 dir_win = 'C:/phue/ip.txt'
@@ -69,16 +67,23 @@ def is_on(*lights_list): # Return state of all lights
 	for i in lights:
 		lights_list.append(i)
 
-	lights_on = []
-	for i in lights_list:
+	lights_on = [] # Return which lights are on
+	lights_bri = [] # Return each brightness
+
+	for i in range(len(lights_list)):
 		try:
 			if (b.get_light(lights_list[i], 'on') == True):
 				lights_on.append(True)
+				bri = b.get_light(lights_list[i], 'bri')
+				bri = round(bri / 254 * 100, 2)
+				lights_bri.append(bri)
 			else:
 				lights_on.append(False)
+				lights_bri.append(0)
 		except Exception as e: ## ARRUMAR ISSO QND TIRAR LUZ
 			lights_on.insert(0,False)
-	return lights_on
+			lights_bri.insert(0,0)
+	return lights_on, lights_bri
 
 def get_light_names(*lights_list): # Return light names from phone app
 	lights_list = []
@@ -89,6 +94,23 @@ def get_light_names(*lights_list): # Return light names from phone app
 	for i in lights_list:
 		lights_name.append(b.get_light(i, 'name'))
 	return lights_name
+
+# def get_bri(*light_list):
+# 	lights_list = []
+# 	for i in lights:
+# 		lights_list.append(i)
+#
+# 	lights_bri = []
+#
+# 	for i in range(len(lights_list)):
+# 		try:
+# 			if (b.get_light(lights_list[i], 'on') == True):
+# 				lights_bri.append(b.get_light(lights_list[i], 'bri'))
+# 			else:
+# 				lights_bri.append(0)
+# 		except Exception as e:
+# 			lights_bri.insert(0,0)
+# 	return lights_bri
 
 # def do_light_old(brilho=254, tt=0, *lights_list):
 # 	# cond = 1
@@ -148,6 +170,7 @@ def do_light(mode=None, brilho=254, tt=0, *lights_list): # Control on/off, brigh
 	return list_t
 
 def rgb_color(r, g, b):
+
 	x = 0.4124*r + 0.3576*g + 0.1805*b
 	y = 0.2126*r + 0.7152*g + 0.0722*b
 	z = 0.0193*r + 0.1192*g + 0.9505*b
@@ -157,19 +180,27 @@ def rgb_color(r, g, b):
 
 
 am = rgb_color(255,225,122)
-br = [.3, .3]
+br = [.3612, .3669]
 
 names = get_light_names()
+print_names = names
+print_names[:0] = ['LIGHTS']
 
-
+# print(b.get_light(3,'bri'))
 ############################## MAIN LOOP ##############################
 
 while True:
 
 	on = is_on()
-	print(on)
-	print(names, '\n')
-	print('* VERSION 3 *\n'.center(size))
+	print_on = on
+	print_on[0][:0] = ['ON/OFF']
+	print_on[1][:0] = ['BRIGHTNESS (%)']
+	# print(on, '\n\n\n')
+	# print(on[0][2])
+	print('Version 3 (7/3/20)\n\n\n\n\n'.center(size))
+
+	for i in range(len(print_names)):
+		print('      ', print_names[i].center(size//4), str(print_on[0][i]).center(size//5), str(print_on[1][i]).center(size//4),'\n')
 	usr = input('\n\n\n\n-> ')
 
 	v = usr.split(' ')
@@ -242,7 +273,7 @@ while True:
 
 				if (v[0] == 'b'): # Controla desk (bed) e brilho
 
-					if (on[2] == True): # Se on, up brightness
+					if (on[0][2] == True): # Se on, up brightness
 					# if (b.get_light(3,'on') == True):
 						lights[3].brightness = int(x)
 					else: # Se off, ligar e up brightness
@@ -250,14 +281,14 @@ while True:
 
 				elif (v[0] == 'c'): # Controla teto e brilho
 
-					if (on[1] == True and on[3] == True): # Se todas on, mudar brilho
+					if (on[0][1] == True and on[0][3] == True): # Se todas on, mudar brilho
 					# if (b.get_light(2,'on') == True or b.get_light(4,'on') == True):
 						lights[2].brightness = int(x)
 						lights[4].brightness = int(x)
-					elif (on[1] == True and on[3] == False): # Se uma off, mudar brilho e ligar outra
+					elif (on[0][1] == True and on[0][3] == False): # Se uma off, mudar brilho e ligar outra
 						lights[2].brightness = int(x)
 						do_light(None, int(x),0,0,0,0,1)
-					elif (on[1] == False and on[3] == True): # Idem cima
+					elif (on[0][1] == False and on[0][3] == True): # Idem cima
 						lights[4].brightness = int(x)
 						do_light(None, int(x),0,0,1,0,0)
 					else: # Se todas off, ligar todas e mudar brilho
