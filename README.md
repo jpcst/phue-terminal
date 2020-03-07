@@ -7,6 +7,8 @@ pip install requests
 pip install pyserial
 ```
 
+use ehue.py in linux folder
+
 
 
 
