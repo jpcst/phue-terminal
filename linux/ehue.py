@@ -180,27 +180,29 @@ def rgb_color(r, g, b):
 
 
 am = rgb_color(255,225,122)
-br = [.3612, .3669]
+# br = [.3612, .3669]
+br = [.3, .3]
 
 names = get_light_names()
+# print_names = get_light_names()
 print_names = names
 print_names[:0] = ['LIGHTS']
 
-# print(b.get_light(3,'bri'))
 ############################## MAIN LOOP ##############################
 
 while True:
 
 	on = is_on()
-	print_on = on
+
+	print_on = is_on()
 	print_on[0][:0] = ['ON/OFF']
 	print_on[1][:0] = ['BRIGHTNESS (%)']
-	# print(on, '\n\n\n')
+	print(on, '\n\n\n') # Debug
 	# print(on[0][2])
-	print('Version 3 (7/3/20)\n\n\n\n\n'.center(size))
+	print('      Version 3 (7/3/20)\n\n\n\n\n'.center(size))
 
 	for i in range(len(print_names)):
-		print('      ', print_names[i].center(size//4), str(print_on[0][i]).center(size//5), str(print_on[1][i]).center(size//4),'\n')
+		print('     ', print_names[i].center(size//4), str(print_on[0][i]).center(size//5), str(print_on[1][i]).center(size//4),'\n')
 	usr = input('\n\n\n\n-> ')
 
 	v = usr.split(' ')
@@ -229,34 +231,34 @@ while True:
 		elif (usr == 'nox' or usr == 'off'): # Apaga todas acessas
 			do_light(False,254,0, 1,1,1,1)
 
-		elif (usr == 'party'):
-			from random import randrange
-			from time import sleep
-			# while True:
-			# 	try:
-			# 		# for i in ligadas:
-			# 		# 	color = rgb_color(randrange(255),randrange(255),randrange(255))
-			# 		# 	lights[i].xy = [color[0], color[1]
-			# 		color1 = rgb_color(randrange(255),randrange(255),randrange(255))
-			# 		color2 = rgb_color(randrange(255),randrange(255),randrange(255))
-			# 		color3 = rgb_color(randrange(255),randrange(255),randrange(255))
-			# 		lights[2].xy = [color1[0], color1[1]]
-			# 		lights[3].xy = [color2[0], color2[1]]
-			# 		lights[4].xy = [color3[0], color3[1]]
-			# 		sleep(1)
-			# 	except KeyboardInterrupt:
-			# 		break
-			while True:
-				ligadas = [i for i, y in enumerate(on) if y == True]
-				# print(ligadas)
-				try:
-					for i in range(len(ligadas)):
-						color = rgb_color(randrange(255),randrange(255),randrange(255))
-						luz = ligadas[i] + 1
-						lights[luz].xy = [color[0], color[1]]
-						# sleep(1)
-				except KeyboardInterrupt:
-					break
+		# elif (usr == 'party'):
+		# 	from random import randrange
+		# 	from time import sleep
+		# 	# while True:
+		# 	# 	try:
+		# 	# 		# for i in ligadas:
+		# 	# 		# 	color = rgb_color(randrange(255),randrange(255),randrange(255))
+		# 	# 		# 	lights[i].xy = [color[0], color[1]
+		# 	# 		color1 = rgb_color(randrange(255),randrange(255),randrange(255))
+		# 	# 		color2 = rgb_color(randrange(255),randrange(255),randrange(255))
+		# 	# 		color3 = rgb_color(randrange(255),randrange(255),randrange(255))
+		# 	# 		lights[2].xy = [color1[0], color1[1]]
+		# 	# 		lights[3].xy = [color2[0], color2[1]]
+		# 	# 		lights[4].xy = [color3[0], color3[1]]
+		# 	# 		sleep(1)
+		# 	# 	except KeyboardInterrupt:
+		# 	# 		break
+		# 	while True:
+		# 		ligadas = [i for i, y in enumerate(on) if y == True]
+		# 		# print(ligadas)
+		# 		try:
+		# 			for i in range(len(ligadas)):
+		# 				color = rgb_color(randrange(255),randrange(255),randrange(255))
+		# 				luz = ligadas[i] + 1
+		# 				lights[luz].xy = [color[0], color[1]]
+		# 				# sleep(1)
+		# 		except KeyboardInterrupt:
+		# 			break
 
 		else:
 			print(v[0], 'is not defined.')
@@ -281,18 +283,18 @@ while True:
 
 				elif (v[0] == 'c'): # Controla teto e brilho
 
-					if (on[0][1] == True and on[0][3] == True): # Se todas on, mudar brilho
+					if (on[0][1] == True or on[0][3] == True): # Se todas on, mudar brilho
 					# if (b.get_light(2,'on') == True or b.get_light(4,'on') == True):
 						lights[2].brightness = int(x)
 						lights[4].brightness = int(x)
 					elif (on[0][1] == True and on[0][3] == False): # Se uma off, mudar brilho e ligar outra
 						lights[2].brightness = int(x)
-						do_light(None, int(x),0,0,0,0,1)
+						do_light(None, int(x),0, 0,0,0,1)
 					elif (on[0][1] == False and on[0][3] == True): # Idem cima
 						lights[4].brightness = int(x)
-						do_light(None, int(x),0,0,1,0,0)
+						do_light(None, int(x),0, 0,1,0,0)
 					else: # Se todas off, ligar todas e mudar brilho
-						do_light(None, int(x),0,0,1,0,1)
+						do_light(None, int(x),0, 0,1,0,1)
 
 				else:
 					print(v[0], v[1], 'are not defined.')
@@ -301,35 +303,35 @@ while True:
 
 			if (v[0] == 'c' and v[1] == 'br'): # Muda teto para branco
 
-					if (on[1] == True and on[3] == True): # Se todas on, mudar cor
-						lights[2].xy = [.3, .3]
-						lights[4].xy = [.3, .3]
-					elif (on[1] == True and on[3] == False): # Se uma off, mudar cor e ligar outra
-						lights[2].xy = [.3, .3]
+					if (on[0][1] == True and on[0][3] == True): # Se todas on, mudar cor
+						lights[2].xy = br
+						lights[4].xy = br
+					elif (on[0][1] == True and on[0][3] == False): # Se uma off, mudar cor e ligar outra
+						lights[2].xy = br
 						do_light(254,0,0,0,0,1)
-						lights[4].xy = [.3, .3]
-					elif (on[1] == False and on[3] == True): # Idem cima
-						lights[4].xy = [.3, .3]
+						lights[4].xy = br
+					elif (on[0][1] == False and on[0][3] == True): # Idem cima
+						lights[4].xy = br
 						do_light(None, 254,0,0,1,0,0)
-						lights[2].xy = [.3, .3]
+						lights[2].xy = br
 					else: # Se todas off, ligar todas e mudar brilho
 						do_light(None, 254,0,0,1,0,1)
-						lights[2].xy = [.3, .3]
-						lights[4].xy = [.3, .3]
+						lights[2].xy = br
+						lights[4].xy = br
 
 			elif (v[0] == 'c' and v[1] == 'am'): # Muda teto para amarelo
 
 				# am = rgb_color(0,0,255)
 				# am = rgb_color(255,225,122)
 
-				if (on[1] == True and on[3] == True): # Se todas on, mudar cor
+				if (on[0][1] == True and on[0][3] == True): # Se todas on[0], mudar cor
 					lights[2].xy = [am[0], am[1]]
 					lights[4].xy = [am[0], am[1]]
-				elif (on[1] == True and on[3] == False): # Se uma off, mudar cor e ligar outra
+				elif (on[0][1] == True and on[0][3] == False): # Se uma off, mudar cor e ligar outra
 					lights[2].xy = [am[0], am[1]]
 					do_light(None, 254,0,0,0,0,1)
 					lights[4].xy = [am[0], am[1]]
-				elif (on[1] == False and on[3] == True): # Idem cima
+				elif (on[0][1] == False and on[0][3] == True): # Idem cima
 					lights[4].xy = [am[0], am[1]]
 					do_light(None, 254,0,0,1,0,0)
 					lights[2].xy = [am[0], am[1]]
@@ -340,7 +342,7 @@ while True:
 
 			elif (v[0] == 'b' and v[1] == 'am'): # Muda cama para amarelo
 
-				if(on[2] == True):
+				if(on[0][2] == True):
 					lights[3].xy = [am[0], am[1]]
 				else:
 					do_light(None, 254,0,0,0,1,0)
@@ -348,8 +350,8 @@ while True:
 
 			elif (v[0] == 'b' and v[1] == 'br'): # Muda cama para branco
 
-				if(on[2] == True):
-					lights[3].xy = [.3, .3]
+				if(on[0][2] == True):
+					lights[3].xy = br
 				else:
 					do_light(None, 254,0,0,0,1,0)
-					lights[3].xy = [.3, .3]
+					lights[3].xy = br
