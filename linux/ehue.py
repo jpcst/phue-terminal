@@ -1,5 +1,7 @@
 # !/usr/bin/python3
 
+# Version 3: 24/03/2020
+
 # 1: Bed (off)
 # 2: Ceil. 1
 # 3: Desk
@@ -9,7 +11,7 @@ import os
 import requests
 from phue import Bridge
 
-os.system('mode con cols=50 lines=30')
+os.system('mode con cols=50 lines=28')
 size = os.get_terminal_size().columns
 
 dir_win = 'C:/phue/ip.txt'
@@ -62,7 +64,7 @@ def read_ip(): # Try to connect ip from .txt or scrape from api
 b = read_ip()
 lights = b.get_light_objects('id')
 
-def is_on(*lights_list): # Return state of all lights
+def is_on(*lights_list): # Return a matrix with the state of all lights and brightness
 	lights_list = []
 	for i in lights:
 		lights_list.append(i)
@@ -169,6 +171,30 @@ def do_light(mode=None, brilho=254, tt=0, *lights_list): # Control on/off, brigh
 	# return list_t, brilho, perc, tt
 	return list_t
 
+def change_bri(x, *lights_list): # 0 =< x =< 254
+
+	list_t = []
+	for i in range(len(lights_list)):
+		if(lights_list[i] != 0):
+			i+=1
+			list_t.append(i) # List of lights for alteration
+
+	for i in range(len(list_t)):
+		# print(list_t[i])
+		lights[list_t[i]].brightness = int(x)
+
+def change_xy(list, *lights_list): # CIE 1931
+
+	list_t = []
+	for i in range(len(lights_list)):
+		if(lights_list[i] != 0):
+			i+=1
+			list_t.append(i) # List of lights for alteration
+
+	for i in range(len(list_t)):
+		lights[list_t[i]].xy = list
+
+
 def rgb_color(r, g, b):
 
 	x = 0.4124*r + 0.3576*g + 0.1805*b
@@ -179,31 +205,55 @@ def rgb_color(r, g, b):
 	return round(x_hat,4), round(y_hat,4)
 
 
-am = rgb_color(255,225,122)
-# br = [.3612, .3669]
-br = [.3, .3]
+# def wake_up(min=30.0): # Time to fade in
+# 	from time import sleep
+# 	tick = 2.5
+# 	do_light(True,0,0, 0,1,0,1)
+# 	it = 254 / min
+# 	print(it)
+# 	i = 0
+# 	while True:
+# 		i += 1
+# 		if tick >= 254:
+# 			change_bri(255, 0,1,0,1)
+# 			break
+# 		change_bri(tick, 0,1,0,1)
+# 		print(is_on(0,1,0,1)[1])
+# 		tick += it
+# 		print(tick, i)
+# 		sleep(60)
+
+
+# wake_up()
+
+
+
+am = rgb_color(255,225,122) # Yellow
+br = [.3, .3] # White
 
 names = get_light_names()
 # print_names = get_light_names()
 print_names = names
 print_names[:0] = ['LIGHTS']
 
-############################## MAIN LOOP ##############################
+############################## MAIN LOOP ##############################################################################################################################
 
-while True:
+def mainloop():
 
+	print('\n\n')
 	on = is_on()
-
 	print_on = is_on()
 	print_on[0][:0] = ['ON/OFF']
 	print_on[1][:0] = ['BRIGHTNESS (%)']
-	print(on, '\n\n\n') # Debug
+	# print(on, '\n\n\n') # Debug
 	# print(on[0][2])
-	print('      Version 3 (7/3/20)\n\n\n\n\n'.center(size))
+	print('       Version 3 (7/3/20)\n\n\n\n\n'.center(size))
 
 	for i in range(len(print_names)):
 		print('     ', print_names[i].center(size//4), str(print_on[0][i]).center(size//5), str(print_on[1][i]).center(size//4),'\n')
+
 	usr = input('\n\n\n\n-> ')
+
 
 	v = usr.split(' ')
 
@@ -225,11 +275,19 @@ while True:
 		elif (usr == 'b'): # Cama (desk)
 			do_light(None,254,0, 0,0,1,0)
 
+		elif (usr == 'nox' or usr == 'off'): # Apaga todas acessas
+			do_light(False,254,0, 1,1,1,1)
+
 		elif (usr == 'on' or usr == 'all'):
 			do_light(True,254,0, 1,1,1,1)
 
-		elif (usr == 'nox' or usr == 'off'): # Apaga todas acessas
-			do_light(False,254,0, 1,1,1,1)
+		elif (usr == 'party'):
+			do_light(True,254,0, 1,1,1,1)
+			# lights[2].brightness = 51
+			# lights[4].brightness = 51
+			change_bri(51, 0,1,0,1)
+
+
 
 		# elif (usr == 'party'):
 		# 	from random import randrange
@@ -285,8 +343,9 @@ while True:
 
 					if (on[0][1] == True or on[0][3] == True): # Se todas on, mudar brilho
 					# if (b.get_light(2,'on') == True or b.get_light(4,'on') == True):
-						lights[2].brightness = int(x)
-						lights[4].brightness = int(x)
+						change_bri(int(x),0,1,0,1)
+						# lights[2].brightness = int(x)
+						# lights[4].brightness = int(x)
 					elif (on[0][1] == True and on[0][3] == False): # Se uma off, mudar brilho e ligar outra
 						lights[2].brightness = int(x)
 						do_light(None, int(x),0, 0,0,0,1)
@@ -355,3 +414,6 @@ while True:
 				else:
 					do_light(None, 254,0,0,0,1,0)
 					lights[3].xy = br
+
+while True:
+	mainloop()
