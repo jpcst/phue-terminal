@@ -112,7 +112,6 @@ def do_light(bri=254, tt=0, *lights_list):
             for i in range(len(list_t)):
                 b.set_light(list_t[i], 'on', True, transitiontime=tt)
                 lights[list_t[i]].brightness = bri
-
     return list_t
 
 def is_digit(x):
@@ -121,6 +120,14 @@ def is_digit(x):
         return True
     except ValueError:
         return False
+
+def rgb_color(r, g, b):
+	x = 0.4124*r + 0.3576*g + 0.1805*b
+	y = 0.2126*r + 0.7152*g + 0.0722*b
+	z = 0.0193*r + 0.1192*g + 0.9505*b
+	x_hat = x / (x+y+z)
+	y_hat = y / (x+y+z)
+	return round(x_hat,4), round(y_hat,4)
 
 names = lights_name()
 
@@ -219,7 +226,6 @@ while True:
             
             elif v[0] == 'd':
                 # POS 4
-
                 if list[4] == 1:
                     lights[5].brightness = int(bri)
                 else:
@@ -227,7 +233,6 @@ while True:
                 
             elif v[0] == 'b':
                 # POS 2
-
                 if list[2] == 1:
                     lights[3].brightness = int(bri)
                 else:
@@ -256,15 +261,12 @@ while True:
                 
                 elif list[1] == 0 and list[3] == 1 and list[5] == 1 and list[6] == 1:
                     do_light(254, 0, *cei1)
- 
                 
                 elif list[1] == 1 and list[3] == 0 and list[5] == 1 and list[6] == 1:
                     do_light(254, 0, *cei2)
  
-
                 elif list[1] == 1 and list[3] == 1 and list[5] == 0 and list[6] == 1:
                     do_light(254, 0, *cei3)
-
 
                 elif list[1] == 1 and list[3] == 1 and list[5] == 1 and list[6] == 0:
                     do_light(254, 0, *cei4)
@@ -284,15 +286,12 @@ while True:
                 
                 elif list[1] == 0 and list[3] == 1 and list[5] == 1 and list[6] == 1:
                     do_light(254, 0, *cei1)
- 
-                
+   
                 elif list[1] == 1 and list[3] == 0 and list[5] == 1 and list[6] == 1:
                     do_light(254, 0, *cei2)
  
-
                 elif list[1] == 1 and list[3] == 1 and list[5] == 0 and list[6] == 1:
                     do_light(254, 0, *cei3)
-
 
                 elif list[1] == 1 and list[3] == 1 and list[5] == 1 and list[6] == 0:
                     do_light(254, 0, *cei4)
@@ -307,3 +306,13 @@ while True:
             
             else:
                 print(v[0], v[1], 'NOT DEFINED.')
+    
+    elif len(v) == 3:
+        clean()
+
+        if is_digit(v[0]) == True and is_digit(v[1]) == True and is_digit(v[2]) == True:
+            color = rgb_color(float(v[0]), float(v[1]), float(v[2]))
+            print(v, '->',color)
+            for i in range(len(list)):
+                if list[i] == 1:
+                    lights[i+1].xy = [color[0], color[1]]
