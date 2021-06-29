@@ -1,4 +1,4 @@
-# phue-arduino
+# phue-terminal
 
 ```
 Python 3.6
