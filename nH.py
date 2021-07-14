@@ -29,6 +29,7 @@ all = [0,1,1,1,1,1,1]
 # CIE 1931
 white = [0.3, 0.3]
 yellow = [0.39, 0.4]
+yellow_relax = [0.5019, 0.4152]
 yellow_bed = [0.5203, 0.4141]
 # red = [0.6401, 0.33]
 # green = [0.3, 0.6]
@@ -246,6 +247,13 @@ while True:
                 else:
                     do_light(254, 0, *desk)
                     lights[5].xy = white
+            
+            elif v[0] == 'd' and v[1] == 'am':
+                if list[4] == 1:
+                    lights[5].xy = yellow_relax
+                else:
+                    do_light(254, 0, *desk)
+                    lights[5].xy = yellow_relax
 
             elif v[0] == 'b' and v[1] == 'am':
                 if list[2] == 1:
